@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require('apollo-server')
+const { ApolloServer, gql, UserInputError } = require('apollo-server')
 
 const mongoose = require('mongoose')
 const Task = require('./models/task')
@@ -42,7 +42,13 @@ const resolvers = {
     }
   },
   Mutation: {
-    addTask: (root, args) => {
+    addTask: async (root, args) => {
+      const newTask = new Task({...args})
+      try {
+        await newTask.save()
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
       return new Task({...args}).save()
     }
   }
