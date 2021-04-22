@@ -1,6 +1,7 @@
 const { ApolloServer, gql, UserInputError } = require('apollo-server')
 
 const mongoose = require('mongoose')
+const Category = require('./models/category')
 const Task = require('./models/task')
 
 const MONGODB_URI = 'mongodb+srv://fullstack:fullstack2020@cluster0.thypf.mongodb.net/taskerbackendtest?retryWrites=true&w=majority'
@@ -18,6 +19,10 @@ console.log('connecting to ', MONGODB_URI);
 //connect
 
 const typeDefs = gql`
+  type Category {
+    name: String!
+  }
+
   type Task {
     name: String!
     category: String
@@ -25,6 +30,7 @@ const typeDefs = gql`
 
   type Query {
     allTasks: [Task!]!
+    allCategories: [Category!]!
   }
 
   type Mutation {
@@ -32,6 +38,9 @@ const typeDefs = gql`
       name: String!
       category: String
     ): Task
+    addCategory(
+      name:String!
+    ): Category
   }
 `
 
@@ -39,6 +48,9 @@ const resolvers = {
   Query: {
     allTasks: () => {
       return Task.find()
+    },
+    allCategories: () => {
+      return Category.find()
     }
   },
   Mutation: {
@@ -49,7 +61,16 @@ const resolvers = {
       } catch (error) {
         throw new UserInputError(error.message)
       }
-      return new Task({...args}).save()
+      return newTask
+    },
+    addCategory: async (root, args) => {
+      const newCategory = new Category({...args})
+      try {
+        await newCategory.save()
+      } catch {
+        throw new UserInputError(error.message)
+      }
+      return newCategory
     }
   }
 
