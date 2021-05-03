@@ -1,10 +1,12 @@
 const { ApolloServer, gql, UserInputError } = require('apollo-server')
+require('dotenv').config()
 
 const mongoose = require('mongoose')
 const Category = require('./models/category')
 const Task = require('./models/task')
+const DB_PASS = process.env.DB_PASS
 
-const MONGODB_URI = 'mongodb+srv://fullstack:fullstack2020@cluster0.thypf.mongodb.net/taskerbackendtest?retryWrites=true&w=majority'
+const MONGODB_URI = `mongodb+srv://fullstack:${DB_PASS}@cluster0.thypf.mongodb.net/taskerbackendtest?retryWrites=true&w=majority`
 
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
   .then(() => {
